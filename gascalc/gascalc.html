@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ガス使用量計算ツール</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #7f8c8d;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        #dateTime {
+            width: 120px;
+        }
+
+        #flow {
+            width: 80px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .clear-btn {
+            background-color: #e74c3c;
+        }
+
+        .clear-btn:hover {
+            background-color: #c0392b;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            background-color: #ecf0f1;
+            margin-bottom: 5px;
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .error {
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            width: 20px;
+            height: 20px;
+            color: white;
+            text-align: center;
+            line-height: 20px;
+            font-weight: bold;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #34495e;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            transform: translateX(-30%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .info-icon {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #b7b7b7;
+            cursor: help;
+            font-size: 10px;
+            color: #fff;
+            text-align: center;
+            line-height: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-buttons button {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .settings-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+
+        .settings-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .settings-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .setting-item {
+            margin-bottom: 10px;
+            display: flex;
+            /* setting-item 内の要素を横並びにする */
+            align-items: center;
+            /* setting-item 内の要素を垂直方向に中央揃え */
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 5px;
+            margin-right: 10px;
+        }
+
+        /* FiO2入力欄のスタイル */
+        #fio2Input {
+            width: 80px;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        #fio2InputGroup {
+            display: none;
+            /* 初期状態では非表示 */
+        }
+
+        /* トグルスイッチのスタイル */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            /* スイッチ全体の幅 */
+            height: 20px;
+            /* スイッチ全体の高さ */
+            margin-right: 10px;
+            /* ラベルとの間隔 */
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            /* チェックボックスを非表示にする */
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 20px;
+            /* スライダーの角を丸くする */
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            /* スイッチの円の高さを調整 */
+            width: 16px;
+            /* スイッチの円の幅を調整 */
+            left: 2px;
+            /* スイッチの円の位置を調整 */
+            bottom: 2px;
+            /* スイッチの円の位置を調整 */
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+            /* スイッチの円を丸くする */
+        }
+
+        input:checked+.slider {
+            background-color: #3498db;
+            /* スイッチオン時の色 */
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #3498db;
+            /* スイッチにフォーカスした時の影 */
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(20px);
+            -ms-transform: translateX(20px);
+            transform: translateX(20px);
+            /* スイッチオン時の円の移動距離 */
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            padding: 10px 20px;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title-container">
+                <h1>ガス使用量計算ツール</h1>
+                <div class="tooltip" onclick="toggleSettings()">
+                    ⚙️
+                    <span class="tooltiptext">設定画面を開きます</span>
+                </div>
+            </div>
+            <button class="clear-btn" onclick="clearAll()">クリア</button>
+        </div>
+
+        <!-- 設定画面 -->
+        <div id="settingsOverlay" class="settings-overlay">
+            <div class="settings-modal">
+                <div class="settings-header">
+                    <h2 class="settings-title">設定</h2>
+                    <span class="close-btn" onclick="toggleSettings()">&times;</span>
+                </div>
+                <div class="setting-item">
+                    <label class="setting-label" for="fio2Mode">
+                        FiO2モード
+                        <span class="tooltip">
+                            <span class="info-icon">?</span>
+                            <span class="tooltiptext">
+                                FiO2を指定してガスの使用量を計算できます。<br>
+                                ハイフローセラピーや人工呼吸器の算定に利用できます。
+                            </span>
+                        </span>
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="fio2Mode" onchange="toggleFio2Mode()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label class="setting-label" for="noRoomAirMode">
+                        室内気不使用
+                        <span class="tooltip">
+                            <span class="info-icon">?</span>
+                            <span class="tooltiptext">
+                                室内気(RoomAir)を使用せず、医療ガスのみを用いる場合の設定です。<br>
+                                一部の人工呼吸器で使用します。<br>
+                                ※FiO2モード有効時のみ使用できます。
+                            </span>
+                        </span>
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="noRoomAirMode" onchange="toggleNoRoomAirMode()" disabled="true">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div id="error" class="error"></div>
+        <h2>入力内容</h2>
+        <ul id="entries"></ul>
+        <h2>ガス使用量</h2>
+        <ul id="usage"></ul>
+        <div class="footer">
+            <div class="input-container">
+                <div class="input-group">
+                    <label for="dateTime">日付時刻
+                        <span class="tooltip">
+                            <span class="info-icon">?</span> <span class="tooltiptext">
+                                2日9時7分であれば20907と入力<br>
+                                日付を省略することも可能<br>
+                                （その場合、直近で指定した日付を引き継ぐ）<br>
+                                入力は時系列順ではなく、順不同でも可
+                            </span>
+                        </span>
+                    </label>
+                    <input type="text" id="dateTime" placeholder="DDHHMM">
+                </div>
+                <div class="input-group">
+                    <label for="flow">
+                        流量 (L/min)
+                        <span class="tooltip">
+                            <span class="info-icon">?</span> <span class="tooltiptext">
+                                酸素1.5L/minであれば、1.5と入力<br>
+                                人工呼吸器の場合は、分時換気量を入力
+                            </span>
+                        </span>
+                    </label>
+                    <input type="text" id="flow" placeholder="例:3">
+                </div>
+                <div class="input-group" id="fio2InputGroup">
+                    <label for="fio2Input">
+                        FiO2 (%)
+                        <span class="tooltip">
+                            <span class="info-icon">?</span> <span class="tooltiptext">
+                                酸素濃度を指定する<br>
+                                21以上100以下の整数を入力
+                            </span>
+                        </span>
+                    </label>
+                    <input type="text" id="fio2Input" placeholder="例:40">
+                </div>
+                <button onclick="addEntry()">追加</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+        let lastDate = new Date();
+        let fio2Mode = false; // FiO2モードの有効/無効
+        let noRoomAirMode = false; // 室内気不使用モードの有効/無効
+
+        function addEntry() {
+            const dateTimeInput = document.getElementById('dateTime');
+            const flowInput = document.getElementById('flow');
+            const fio2Input = document.getElementById('fio2Input');
+            const error = document.getElementById('error');
+            const dateTime = dateTimeInput.value;
+            const flow = flowInput.value;
+            let fio2 = 21;
+
+            if (!dateTime || !flow) {
+                error.textContent = '日付時刻と流量を入力してください。';
+                return;
+            }
+
+            const parsedDateTime = parseDateTime(dateTime);
+            if (!parsedDateTime) {
+                error.textContent = '無効な日付時刻です。';
+                return;
+            }
+
+            const parsedFlow = parseFloat(flow);
+            if (isNaN(parsedFlow) || parsedFlow < 0) {
+                error.textContent = '無効な流量です。';
+                return;
+            }
+
+            if (fio2Mode) {
+                fio2 = parseInt(fio2Input.value);
+                if (isNaN(fio2) || fio2 < 21 || fio2 > 100) {
+                    error.textContent = '無効なFiO2です。21以上100以下の整数を入力してください。';
+                    return;
+                }
+            }
+
+            error.textContent = '';
+            entries.push({
+                dateTime: parsedDateTime,
+                flow: parsedFlow,
+                fio2: fio2
+            });
+            entries.sort((a, b) => a.dateTime - b.dateTime);
+            updateUI();
+            dateTimeInput.value = '';
+            flowInput.value = '';
+            fio2Input.value = '';
+            dateTimeInput.focus();
+        }
+
+        function parseDateTime(input) {
+            let day, hour, minute;
+
+            // 必要に応じて左側に0を追加
+            input = input.padStart(6, '0');
+
+            day = parseInt(input.slice(0, 2));
+            hour = parseInt(input.slice(2, 4));
+            minute = parseInt(input.slice(4, 6));
+
+            if (day == 0) day = lastDate.getDate();
+
+            if (day > 31 || hour >= 24 || minute >= 60) return null;
+
+            let date = new Date(2024, 0, day, hour, minute);
+
+            lastDate = date;
+            return date;
+        }
+
+        function updateUI() {
+            const entriesList = document.getElementById('entries');
+            entriesList.innerHTML = '';
+            entries.forEach((entry, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${formatDate(entry.dateTime)} ${entry.flow}L/min${fio2Mode ? ` FiO2:${entry.fio2}%` : ''}</span>
+                    <div class="action-buttons">
+                        <button onclick="editEntry(${index})">修正</button>
+                        <button onclick="deleteEntry(${index})">削除</button>
+                    </div>
+                `;
+                entriesList.appendChild(li);
+            });
+
+            const usage = calculateUsage();
+
+            const usageList = document.getElementById('usage');
+            usageList.innerHTML = '';
+            Object.entries(usage).forEach(([date, amounts]) => {
+                let oxygenUsage = amounts.oxygen % 1 === 0 ? Math.floor(amounts.oxygen) : amounts.oxygen.toFixed(1);
+                let nitrogenUsage = amounts.nitrogen % 1 === 0 ? Math.floor(amounts.nitrogen) : amounts.nitrogen.toFixed(1);
+                const li = document.createElement('li');
+                li.innerHTML = `${date}日: 酸素 ${oxygenUsage}L${noRoomAirMode ? ` / 窒素 ${nitrogenUsage}L` : ''}
+                <div class="action-buttons">
+                    <button onclick="copyUsage('${oxygenUsage}', '${nitrogenUsage}')">コピー</button>
+                </div>`;
+                usageList.appendChild(li);
+            });
+        }
+
+        function deleteEntry(index) {
+            entries.splice(index, 1);
+            updateUI();
+        }
+
+        function editEntry(index) {
+            const entry = entries[index];
+            const dateTimeInput = document.getElementById('dateTime');
+            const flowInput = document.getElementById('flow');
+            const fio2Input = document.getElementById('fio2Input');
+            dateTimeInput.value = formatDateForInput(entry.dateTime);
+            flowInput.value = entry.flow;
+            if (fio2Mode) {
+                fio2Input.value = entry.fio2;
+            }
+            deleteEntry(index);
+        }
+
+        function calculateUsage() {
+            const usage = {};
+            for (let i = 0; i < entries.length; i++) {
+                const entry = entries[i];
+                const nextEntry = entries[i + 1];
+                const currentDate = entry.dateTime.getDate();
+                let endTime;
+                if (nextEntry) {
+                    endTime = nextEntry.dateTime;
+                } else {
+                    endTime = new Date(entry.dateTime.getFullYear(), entry.dateTime.getMonth(), currentDate + 1);
+                }
+                let remainingTime = endTime - entry.dateTime;
+                let currentDateTime = new Date(entry.dateTime);
+                while (remainingTime > 0) {
+                    const currentDate = currentDateTime.getDate();
+                    const endOfDay = new Date(currentDateTime.getFullYear(), currentDateTime.getMonth(), currentDate + 1);
+                    const timeUntilEndOfDay = endOfDay - currentDateTime;
+                    const timeToCalculate = Math.min(remainingTime, timeUntilEndOfDay);
+
+                    let oxygenAmount, nitrogenAmount;
+                    if (fio2Mode) {
+                        if (noRoomAirMode) {
+                            // 室内気不使用モードでの計算
+                            nitrogenAmount = ((100 - entry.fio2) * 0.01 * entry.flow) * (timeToCalculate / (1000 * 60));
+                            oxygenAmount = (entry.fio2 * 0.01 * entry.flow) * (timeToCalculate / (1000 * 60));
+                        } else {
+                            // FiO2モードでの酸素使用量計算
+                            oxygenAmount = ((entry.fio2 - 21) * 0.01 / 0.79 * entry.flow) * (timeToCalculate / (1000 * 60));
+                            nitrogenAmount = 0; // 室内気使用時は窒素は計算しない
+                        }
+                    } else {
+                        // 定量酸素モードでの計算
+                        oxygenAmount = (timeToCalculate / (1000 * 60)) * entry.flow;
+                        nitrogenAmount = 0; // 室内気使用時は窒素は計算しない
+                    }
+
+                    if (!usage[currentDate]) usage[currentDate] = { oxygen: 0, nitrogen: 0 };
+                    usage[currentDate].oxygen += oxygenAmount;
+                    usage[currentDate].nitrogen += nitrogenAmount;
+                    currentDateTime = new Date(currentDateTime.getTime() + timeToCalculate);
+                    remainingTime -= timeToCalculate;
+                }
+            }
+
+            // 結果を小数点以下1桁に丸める
+            Object.keys(usage).forEach(date => {
+                usage[date].oxygen = Math.round(usage[date].oxygen * 10) / 10;
+                usage[date].nitrogen = Math.round(usage[date].nitrogen * 10) / 10;
+            });
+
+            return usage;
+        }
+
+        function formatDate(date) {
+            return `${date.getDate()}日${date.getHours().toString().padStart(2, '0')}時${date.getMinutes().toString().padStart(2, '0')}分`;
+        }
+
+        function formatDateForInput(date) {
+            return `${date.getDate()}${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        function clearAll() {
+            entries = [];
+            lastDate = new Date();
+            updateUI();
+            document.getElementById('dateTime').value = '';
+            document.getElementById('flow').value = '';
+            document.getElementById('fio2Input').value = '';
+            document.getElementById('error').textContent = '';
+            document.getElementById('dateTime').focus();
+        }
+
+        function toggleSettings() {
+            document.getElementById('settingsOverlay').style.display = document.getElementById('settingsOverlay').style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleFio2Mode() {
+            fio2Mode = document.getElementById('fio2Mode').checked;
+            document.getElementById('fio2InputGroup').style.display = fio2Mode ? 'flex' : 'none';
+
+            // FiO2モードが無効になった場合、室内気不使用モードも無効にする
+            if (!fio2Mode) {
+                noRoomAirMode = false;
+                document.getElementById('noRoomAirMode').checked = false;
+            }
+
+            document.getElementById('noRoomAirMode').disabled = !fio2Mode;
+            clearAll();
+        }
+
+        function toggleNoRoomAirMode() {
+            noRoomAirMode = document.getElementById('noRoomAirMode').checked;
+            clearAll();
+        }
+
+        function copyUsage(oxygenUsage, nitrogenUsage) {
+            let text = `402400+552010/${oxygenUsage}*1`;
+            if (noRoomAirMode) {
+                text += `\n402400+552010/${nitrogenUsage}*1`;
+            }
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                })
+                .catch(err => {
+                    console.error('コピーに失敗しました: ', err);
+                });
+        }
+
+        // エンターキーの処理
+        document.getElementById('dateTime').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('flow').focus();
+            }
+        });
+        document.getElementById('flow').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                if (fio2Mode) {
+                    document.getElementById('fio2Input').focus();
+                } else {
+                    addEntry();
+                }
+            }
+        });
+        document.getElementById('fio2Input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                addEntry();
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仕事割り振り抽選ツール</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            position: relative;
+            justify-content: center;
+        }
+
+        .participant input[type="checkbox"] {
+            margin-right: 10px;
+            accent-color: #3498db;
+        }
+
+        .participant input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            flex: 1;
+        }
+
+        .participant button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .participant button:hover {
+            background-color: #c0392b;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        /* 抽選ボタンのスタイル変更 */
+        #drawLotteryButton {
+            display: block;
+            /* ブロックレベル要素にする */
+            width: 100%;
+            /* 幅を最大限にする */
+            margin: 20px auto;
+            /* 上下左右にマージンを設定 */
+            padding: 15px 20px;
+            /* パディングを大きく */
+            font-size: 1.2em;
+            /* 文字サイズを大きく */
+            background-color: #4CAF50;
+            /* 緑系の色に変更 */
+        }
+
+        /* tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+            /* ホバー時の下線 */
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* 設定画面のスタイル */
+        .settings-overlay {
+            display: none;
+            /* 初期状態では非表示 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* 背景を半透明にする */
+            z-index: 1000;
+            /* 他の要素よりも上に表示 */
+        }
+
+        .settings-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .settings-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .setting-item {
+            margin-bottom: 10px;
+            display: flex;
+            /* setting-item 内の要素を横並びにする */
+            align-items: center;
+            /* setting-item 内の要素を垂直方向に中央揃え */
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 5px;
+            margin-right: 10px;
+            /* ラベルとテキストボックスの間隔 */
+        }
+
+        .weight-input {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* ローディングアイコンのスタイル */
+        .loading {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid #f3f3f3;
+            /* Light grey */
+            border-top: 4px solid #3498db;
+            /* Blue */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            /* 結果表示領域の中央に配置 */
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>仕事割り振り抽選ツール</h1>
+
+        <div id="participants"></div>
+
+        <button onclick="addParticipant()">参加者を追加</button>
+        <button onclick="toggleSettings()">設定</button>
+        <button onclick="drawLottery()" id="drawLotteryButton">抽選を行う</button>
+        <div id="result"></div>
+    </div>
+
+    <!-- 設定画面 -->
+    <div id="settingsOverlay" class="settings-overlay">
+        <div class="settings-modal">
+            <div class="settings-header">
+                <h2 class="settings-title">設定</h2>
+                <span class="close-btn" onclick="toggleSettings()">&times;</span>
+            </div>
+            <div id="settingsContent">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let participants = [
+            { name: '山田', weight: 100, selected: true },
+            { name: '鈴木', weight: 100, selected: true },
+            { name: '佐藤', weight: 100, selected: true }
+        ];
+
+        function renderParticipants() {
+            const container = document.getElementById('participants');
+            container.innerHTML = '';
+
+            participants.forEach((participant, index) => {
+                const div = document.createElement('div');
+                div.className = 'participant';
+                div.innerHTML = `
+                    <input type="checkbox" ${participant.selected ? 'checked' : ''} onchange="toggleSelection(${index})" id="checkbox-${index}">
+                    <label for="checkbox-${index}" class="tooltip">
+                        <input type="text" value="${participant.name}" onchange="updateName(${index}, this.value)" placeholder="名前" id="name-${index}">
+                        <span class="tooltiptext">名前を入力してください。<br>チェックがついている人が抽選対象になります。</span>
+                    </label>
+                    <button onclick="removeParticipant(${index})">削除</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderSettings() {
+            const container = document.getElementById('settingsContent');
+            container.innerHTML = '';
+
+            participants.forEach((participant, index) => {
+                const div = document.createElement('div');
+                div.className = 'setting-item';
+                div.innerHTML = `
+                    <label for="weight-${index}" class="setting-label">${participant.name}の重み:</label>
+                    <input type="number" value="${participant.weight}" onchange="updateWeight(${index}, this.value)" min="1" class="weight-input" id="weight-${index}">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addParticipant() {
+            participants.push({ name: '', weight: 1, selected: true });
+            renderParticipants();
+            renderSettings();
+        }
+
+        function removeParticipant(index) {
+            participants.splice(index, 1);
+            renderParticipants();
+            renderSettings();
+        }
+
+        function toggleSelection(index) {
+            participants[index].selected = !participants[index].selected;
+        }
+
+        function updateName(index, name) {
+            participants[index].name = name;
+            renderSettings(); // 設定画面の名前も更新
+        }
+
+        function updateWeight(index, weight) {
+            participants[index].weight = parseFloat(weight) || 1;
+        }
+
+        function drawLottery() {
+            // 前回の抽選結果をリセット
+            document.getElementById('result').textContent = '';
+
+            // ローディングアイコンを表示
+            document.getElementById('result').innerHTML = '<div class="loading"></div>';
+
+            const selectedParticipants = participants.filter(p => p.selected && p.name.trim() !== '');
+            if (selectedParticipants.length === 0) {
+                alert('参加者を1人以上選択し、名前を入力してください。');
+                return;
+            }
+
+            const totalWeight = selectedParticipants.reduce((sum, p) => sum + p.weight, 0);
+            let random = Math.random() * totalWeight;
+
+            let winner = ''; // 当選者を格納する変数
+
+            for (const participant of selectedParticipants) {
+                random -= participant.weight;
+                if (random <= 0) {
+                    winner = participant.name;
+                    break;
+                }
+            }
+
+            // 0.3秒後に結果を表示
+            setTimeout(() => {
+                document.getElementById('result').textContent = `${winner}さんが選ばれました！`;
+            }, 300);
+        }
+
+        function toggleSettings() {
+            const overlay = document.getElementById('settingsOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        }
+
+        renderParticipants();
+        renderSettings();
+    </script>
+</body>
+
+</html>
