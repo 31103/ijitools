@@ -13,10 +13,6 @@ body {
     display: block;
 }
 
-#unconvertedData {
-    width: 500px;
-}
-
 .file-status {
     margin-left: 10px;
     /* 選択ボタンとの間隔 */
@@ -50,5 +46,4 @@ body {
 
 .download-link {
     margin-left: 10px;
-    /* 選択ボタンとの間隔 */
 }
