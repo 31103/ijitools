@@ -117,9 +117,13 @@ function processFile(file, conversionTable, downloadLink, progressElement, conve
         const fileContent = e.target.result;
         const convertedFileContent = convertFunction(fileContent, conversionTable);
 
-        const convertedFileContentSJIS = Encoding.convert(convertedFileContent, 'SJIS', 'UNICODE');
-
-        const blob = new Blob([convertedFileContentSJIS], { type: 'text/plain' });
+        const convertedFileContentSJIS = Encoding.convert(convertedFileContent, {
+            to: 'SJIS',
+            from: 'UNICODE',
+            type: 'arraybuffer'
+        });
+        const uint8Array = new Uint8Array(convertedFileContentSJIS);
+        const blob = new Blob([uint8Array], { type: 'text/plain;charset=shift-jis;' });
         const url = window.URL.createObjectURL(blob);
 
         downloadLink.href = url;
@@ -175,9 +179,10 @@ function processFF1File(ff1File, dFile, conversionTable, downloadLink, progressE
             const convertedFileContentSJIS = Encoding.convert(convertedFF1FileContent, {
                 to: 'SJIS',
                 from: 'UNICODE',
+                type: 'arraybuffer'
             });
-
-            const blob = new Blob([convertedFileContentSJIS], { type: 'text/plain' });
+            const uint8Array = new Uint8Array(convertedFileContentSJIS);
+            const blob = new Blob([uint8Array], { type: 'text/plain' });
             const url = window.URL.createObjectURL(blob);
 
             downloadLink.href = url;
