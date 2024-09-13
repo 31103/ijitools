@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>診療科区分変換ツール</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title is-2">診療科区分変換ツール</h1>
+      <p class="subtitle">退院患者調査のE/D/FF1ファイルの診療科区分を医師コードに基づいて変換します。</p>
+
+      <div class="field">
+        <div class="control">
+          <div class="file has-name is-primary">
+            <label class="file-label">
+              <input class="file-input" type="file" id="conversionTable" accept=".csv">
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">
+                  変換表を選択...
+                </span>
+              </span>
+              <span class="file-name">
+                選択されていません
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field has-addons">
+          <div class="control">
+            <div class="file has-name is-link">
+              <label class="file-label">
+                <input class="file-input" type="file" id="eFile" accept=".txt">
+                <span class="file-cta">
+                  <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                  </span>
+                  <span class="file-label">
+                    Eファイルを選択...
+                  </span>
+                </span>
+                <span class="file-name">
+                  選択されていません
+                </span>
+              </label>
+            </div>
+          </div>
+          <div class="control">
+            <a class="button is-primary" id="eFileDownloadLink" download="" style="display: none;">
+              <span class="icon">
+                <i class="fas fa-download"></i>
+              </span>
+              <span>ダウンロード</span>
+            </a>
+            <span id="eFileProgress" style="display: none;"><i class="fas fa-spinner fa-pulse"></i> 処理中</span>
+          </div>
+        </div>
+
+        <div class="field has-addons">
+          <div class="control">
+            <div class="file has-name is-link">
+              <label class="file-label">
+                <input class="file-input" type="file" id="dFile" accept=".txt">
+                <span class="file-cta">
+                  <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                  </span>
+                  <span class="file-label">
+                    Dファイルを選択...
+                  </span>
+                </span>
+                <span class="file-name">
+                  選択されていません
+                </span>
+              </label>
+            </div>
+          </div>
+          <div class="control">
+            <a class="button is-primary" id="dFileDownloadLink" download="" style="display: none;">
+              <span class="icon">
+                <i class="fas fa-download"></i>
+              </span>
+              <span>ダウンロード</span>
+            </a>
+            <span id="dFileProgress" style="display: none;"><i class="fas fa-spinner fa-pulse"></i> 処理中</span>
+          </div>
+        </div>
+
+        <div class="field has-addons">
+          <div class="control">
+            <div class="file has-name is-link">
+              <label class="file-label">
+                <input class="file-input" type="file" id="ff1File" accept=".txt">
+                <span class="file-cta">
+                  <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                  </span>
+                  <span class="file-label">
+                    FF1ファイルを選択...
+                  </span>
+                </span>
+                <span class="file-name">
+                  選択されていません
+                </span>
+              </label>
+            </div>
+          </div>
+          <div class="control">
+            <a class="button is-primary" id="ff1FileDownloadLink" download="" style="display: none;">
+              <span class="icon">
+                <i class="fas fa-download"></i>
+              </span>
+              <span>ダウンロード</span>
+            </a>
+            <span id="ff1FileProgress" style="display: none;"><i class="fas fa-spinner fa-pulse"></i> 処理中</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="control">
+          <button class="button is-primary" id="convertButton">変換</button>
+        </div>
+      </div>
+
+      <div id="unconvertedData" class="message is-info" style="display: none;">
+        <div class="message-header">
+          変換されなかったデータ
+        </div>
+        <div class="message-body">
+          <pre></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.2.0/encoding.min.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
