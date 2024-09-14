@@ -4,153 +4,87 @@
 <head>
   <meta charset="UTF-8">
   <title>診療科区分変換ツール</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.2/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/semantic.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <section class="section">
-    <div class="container">
-      <h1 class="title is-2">診療科区分変換ツール</h1>
-      <p class="subtitle">退院患者調査のE/D/FF1ファイルの診療科区分を医師コードに基づいて変換します。</p>
-
-      <div class="field">
-        <div class="control">
-          <div class="file has-name is-primary">
-            <label class="file-label">
-              <input class="file-input" type="file" id="conversionTable" accept=".csv">
-              <span class="file-cta">
-                <span class="file-icon">
-                  <i class="fas fa-upload"></i>
-                </span>
-                <span class="file-label">
-                  変換表を選択
-                </span>
-              </span>
-              <span class="file-name">
-                選択されていません
-              </span>
-            </label>
-          </div>
-        </div>
+  <div class="ui container">
+    <h1 class="ui header" style="margin-top: 2em;">
+      <i class="hospital icon"></i>
+      <div class="content">
+        診療科区分変換ツール
+        <div class="sub header">退院患者調査のE/D/FF1ファイルの診療科区分を医師コードに基づいて変換します。</div>
       </div>
+    </h1>
 
-      <div class="field">
-        <div class="field is-grouped">
-          <div class="control">
-            <div class="file has-name is-link">
-              <label class="file-label">
-                <input class="file-input" type="file" id="eFile" accept=".txt">
-                <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fas fa-upload"></i>
-                  </span>
-                  <span class="file-label">
-                    Eファイルを選択
-                  </span>
-                </span>
-                <span class="file-name">
-                  選択されていません
-                </span>
-              </label>
-            </div>
-          </div>
-          <div class="control">
-            <a class="button is-link" id="eFileDownloadLink" download="" style="display: none;">
-              <span class="icon">
-                <i class="fas fa-download"></i>
-              </span>
-              <span>Eファイルをダウンロード</span>
-            </a>
-            <span id="eFileProgress" style="display: none;"><i class="fas fa-spinner fa-pulse"></i> 処理中</span>
-          </div>
-        </div>
-
-        <div class="field is-grouped">
-          <div class="control">
-            <div class="file has-name is-link">
-              <label class="file-label">
-                <input class="file-input" type="file" id="dFile" accept=".txt">
-                <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fas fa-upload"></i>
-                  </span>
-                  <span class="file-label">
-                    Dファイルを選択
-                  </span>
-                </span>
-                <span class="file-name">
-                  選択されていません
-                </span>
-              </label>
-            </div>
-          </div>
-          <div class="control">
-            <a class="button is-link" id="dFileDownloadLink" download="" style="display: none;">
-              <span class="icon">
-                <i class="fas fa-download"></i>
-              </span>
-              <span>Dファイルをダウンロード</span>
-            </a>
-            <span id="dFileProgress" style="display: none;"><i class="fas fa-spinner fa-pulse"></i> 処理中</span>
-          </div>
-        </div>
-
-        <div class="field is-grouped">
-          <div class="control">
-            <div class="file has-name is-link">
-              <label class="file-label">
-                <input class="file-input" type="file" id="ff1File" accept=".txt">
-                <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fas fa-upload"></i>
-                  </span>
-                  <span class="file-label">
-                    FF1ファイルを選択
-                  </span>
-                </span>
-                <span class="file-name">
-                  選択されていません
-                </span>
-              </label>
-            </div>
-          </div>
-          <div class="control">
-            <a class="button is-link" id="ff1FileDownloadLink" download="" style="display: none;">
-              <span class="icon">
-                <i class="fas fa-download"></i>
-              </span>
-              <span>FF1ファイルをダウンロード</span>
-            </a>
-            <span id="ff1FileProgress" style="display: none;"><i class="fas fa-spinner fa-pulse"></i> 処理中</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="field">
-        <div class="control">
-          <button class="button is-primary" id="convertButton">
-            <span class="icon">
-              <i class="fas fa-arrows-rotate"></i>
-            </span>
-            <span>変換</span>
-          </button>
-        </div>
-      </div>
-
-      <div id="unconvertedData" class="message is-info" style="display: none;">
-        <div class="message-header">
-          変換されなかったデータ
-        </div>
-        <div class="message-body">
-          <pre></pre>
-        </div>
+    <div class="ui segment">
+      <h3 class="ui header">
+        <i class="file excel outline icon"></i>
+        変換表のアップロード
+      </h3>
+      <div class="ui file input">
+        <input type="file" id="conversionTable" accept=".csv">
       </div>
     </div>
-  </section>
 
+    <div class="ui segments">
+      <div class="ui segment">
+        <h3 class="ui header">
+          <i class="file alternate outline icon"></i> Eファイル
+        </h3>
+        <div class="ui file input">
+          <input type="file" id="eFile" accept=".txt">
+        </div>
+        <div class="ui active inline loader" id="eFileProgress" style="display: none;"></div>
+        <a class="ui primary button" id="eFileDownloadLink" download="" style="display: none; margin-top: 1em;">
+          <i class="download icon"></i> ダウンロード
+        </a>
+      </div>
+      <div class="ui segment">
+        <h3 class="ui header">
+          <i class="file alternate outline icon"></i> Dファイル
+        </h3>
+        <div class="ui file input">
+          <input type="file" id="dFile" accept=".txt">
+        </div>
+        <div class="ui active inline loader" id="dFileProgress" style="display: none;"></div>
+        <a class="ui primary button" id="dFileDownloadLink" download="" style="display: none; margin-top: 1em;">
+          <i class="download icon"></i> ダウンロード
+        </a>
+      </div>
+      <div class="ui segment">
+        <h3 class="ui header">
+          <i class="file alternate outline icon"></i> FF1ファイル
+        </h3>
+        <div class="ui file input">
+          <input type="file" id="ff1File" accept=".txt">
+        </div>
+        <div class="ui active inline loader" id="ff1FileProgress" style="display: none;"></div>
+        <a class="ui primary button" id="ff1FileDownloadLink" download="" style="display: none; margin-top: 1em;">
+          <i class="download icon"></i> ダウンロード
+        </a>
+      </div>
+    </div>
+
+    <button class="ui primary button" id="convertButton">
+      <i class="sync icon"></i> 変換
+    </button>
+
+    <div id="unconvertedData" class="ui warning message" style="display: none; margin-top: 2em;">
+      <i class="close icon"></i>
+      <div class="header">
+        変換されなかったデータ
+      </div>
+      <div id="unconverted-list">
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.2.0/encoding.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/semantic.min.js"></script>
   <script src="script.js"></script>
 </body>
 

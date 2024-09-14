@@ -3,7 +3,6 @@ const eFileInput = document.getElementById('eFile');
 const dFileInput = document.getElementById('dFile');
 const ff1FileInput = document.getElementById('ff1File');
 const convertButton = document.getElementById('convertButton');
-// ダウンロードボタンと処理中表示要素を取得
 const eFileDownloadLink = document.getElementById('eFileDownloadLink');
 const eFileProgress = document.getElementById('eFileProgress'); // 新規追加
 const dFileDownloadLink = document.getElementById('dFileDownloadLink');
@@ -13,43 +12,6 @@ const ff1FileProgress = document.getElementById('ff1FileProgress'); // 新規追
 
 // 変換されなかったデータを格納するオブジェクトを定義
 let unconvertedData = {};
-
-document.getElementById('conversionTable').addEventListener('change', function (e) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-        const csvData = e.target.result;
-        const isValid = validateCSV(csvData);
-
-        if (!isValid) {
-            alert('変換表のフォーマットが不正です。');
-        }
-    }
-});
-
-function validateCSV(csvData) {
-    const lines = csvData.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line === "") continue; // Skip empty lines
-
-        const values = line.split(',');
-        if (values.length !== 2) {
-            console.error(`Line ${i + 1}: Invalid number of values.`);
-            return false;
-        }
-
-        const doctorCode = values[0].trim().padStart(4, '0');
-        const departmentCode = values[1].trim().padStart(3, '0');
-
-        if (!/^\d{4}$/.test(doctorCode) || !/^\d{3}$/.test(departmentCode)) {
-            console.error(`Line ${i + 1}: Invalid format for doctor code or department code.`);
-            return false;
-        }
-    }
-    return true;
-}
 
 convertButton.addEventListener('click', () => {
     unconvertedData = {};
@@ -105,7 +67,6 @@ function validateFileName(file, prefix) {
     return true;
 }
 
-// processFile 関数を修正
 function processFile(file, conversionTable, downloadLink, progressElement, convertFunction) {
     // 処理中表示開始
     progressElement.style.display = 'inline-block';
@@ -232,7 +193,7 @@ function convertFF1File(ff1FileContent, dFileContent, conversionTable) {
 // 変換されなかったデータを表示する関数
 function displayUnconvertedData(unconvertedData) {
     const unconvertedDataContainer = document.getElementById('unconvertedData');
-    const unconvertedDataContent = unconvertedDataContainer.querySelector('.message-body');
+    const unconvertedDataContent = document.getElementById('unconverted-list');
     unconvertedDataContent.innerHTML = ''; // 既存の内容をクリア
 
     if (Object.keys(unconvertedData).length > 0) {
@@ -273,36 +234,3 @@ function displayUnconvertedData(unconvertedData) {
         unconvertedDataContainer.style.display = 'block';
     }
 }
-
-// ファイル名を表示する関数
-function displayFileName(inputElement, fileNameElement) {
-    const file = inputElement.files[0];
-    fileNameElement.textContent = file ? file.name : '選択されていません';
-}
-
-// DOMContentLoadedイベント内で各ファイル入力要素にイベントリスナーを追加
-document.addEventListener('DOMContentLoaded', () => {
-    const conversionTableInput = document.getElementById('conversionTable');
-    const conversionTableFileName = conversionTableInput.closest('.file').querySelector('.file-name');
-    conversionTableInput.addEventListener('change', () => {
-        displayFileName(conversionTableInput, conversionTableFileName);
-    });
-
-    const eFileInput = document.getElementById('eFile');
-    const eFileFileName = eFileInput.closest('.file').querySelector('.file-name');
-    eFileInput.addEventListener('change', () => {
-        displayFileName(eFileInput, eFileFileName);
-    });
-
-    const dFileInput = document.getElementById('dFile');
-    const dFileFileName = dFileInput.closest('.file').querySelector('.file-name');
-    dFileInput.addEventListener('change', () => {
-        displayFileName(dFileInput, dFileFileName);
-    });
-
-    const ff1FileInput = document.getElementById('ff1File');
-    const ff1FileFileName = ff1FileInput.closest('.file').querySelector('.file-name');
-    ff1FileInput.addEventListener('change', () => {
-        displayFileName(ff1FileInput, ff1FileFileName);
-    });
-});
