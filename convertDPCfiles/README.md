@@ -2,6 +2,8 @@
 
 このツールは、退院患者調査のE/D/FF1ファイルの診療科区分を、医師コードに基づいて変換します。
 
+[診療科区分変換ツール（デモ）](https://31103.github.io/ijitools/convertDPCfiles/convert.html)
+
 ## 機能
 
 * CSV形式の変換表を用いて、診療科区分を自動変換します。
